@@ -25,7 +25,6 @@ TRINITY_DN119063_c0_g1_i1
 TRINITY_DN119063_c0_g2_i1
 ```
 
-```
 Now use this file to grep the headers:
 ```
 for i in `cat ./example_list_of_differentially_expressed_transcripts.txt `; do grep -i $i ../muel/de_novo_assembly_trinity/muel_trinity_assembly_all_batches.Trinity.fasta >> names.txt;done
