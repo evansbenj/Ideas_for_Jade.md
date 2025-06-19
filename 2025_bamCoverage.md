@@ -18,7 +18,7 @@ bamCoverage is a tool in the package "deepTools" that calculates coverage in win
 
 module load StdEnv/2023 python/3.13.2
 
-/home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/deepTools/deeptools/vcf_env/bin/bamCoverage -b ${1} --outFileFormat bedgraph --binSize 100000 --ignoreDuplicates --minMappingQuality 30 -o ${1}_bamCoverage.bw
+/home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/deepTools/deeptools/vcf_env/bin/bamCoverage -b ${1} --normalizeUsing RPKM --outFileFormat bedgraph --binSize 100000 --ignoreDuplicates --minMappingQuality 30 -o ${1}_bamCoverage.bw
 ```
 # Plot
 ```
