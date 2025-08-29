@@ -22,3 +22,64 @@ Perform the 2nd pass alignment for all your samples using this new, updated geno
 This pass will use the comprehensive set of novel junctions identified in the first pass, improving mapping accuracy for these junctions.
 ```
 
+# First pass index:
+```
+#!/bin/sh
+#SBATCH --job-name=star_index
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --time=24:00:00
+#SBATCH --mem=256gb
+#SBATCH --output=star_index.%J.out
+#SBATCH --error=star_index.%J.err
+#SBATCH --account=rrg-ben
+
+module load star/2.7.11b
+
+STAR --runMode genomeGenerate --genomeDir /home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/without_bubbles/ --genomeFastaFiles /home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/without_bubbles/allo.fasta.contigs_nobubbles.fasta --runThreadN 8 --limitGenomeGenerateRAM=124544990592
+```
+# First pass alignment
+```
+#!/bin/sh
+#SBATCH --job-name=STAR_map
+#SBATCH --nodes=6
+#SBATCH --ntasks-per-node=1
+#SBATCH --time=4:00:00
+#SBATCH --mem=64gb
+#SBATCH --output=STAR_map.%J.out
+#SBATCH --error=STAR_map.%J.err
+#SBATCH --account=def-ben
+
+
+module load star/2.7.11b
+
+STAR --runMode alignReads \
+     --genomeDir /home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/with_bubbles/ \
+     --runThreadN 6 \
+     --readFilesIn ${1} ${2} \
+     --outFileNamePrefix ${3} \
+     --outSAMtype BAM SortedByCoordinate \
+     --outSAMunmapped Within \
+     --outSAMattributes Standard \
+     --readFilesCommand zcat
+```
+# Concatenate SJ tab filez
+```
+cat *tab > allo_all_SJ.out.tab
+```
+# Second pass index:
+```
+#!/bin/sh
+#SBATCH --job-name=star_index
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --time=24:00:00
+#SBATCH --mem=256gb
+#SBATCH --output=star_index.%J.out
+#SBATCH --error=star_index.%J.err
+#SBATCH --account=rrg-ben
+
+module load star/2.7.11b
+
+STAR --runMode genomeGenerate --genomeDir /home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/without_bubbles/ --genomeFastaFiles /home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/without_bubbles/allo.fasta.contigs_nobubbles.fasta --runThreadN 8 --sjdbFileChrStartEnd allo_all_SJ.out.tab --limitGenomeGenerateRAM=124544990592
+```
