@@ -1,5 +1,10 @@
 # Mapping RNAseq data to allofraseri genome assembly
 
+Directory:
+```
+/home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/ben_scripts
+```
+
 We lack an annotation file for the allofraseri genome but we can still align the RNAseq data to this genome using STAR: https://docs.gdc.cancer.gov/Data/Bioinformatics_Pipelines/Expression_mRNA_Pipeline/
 
 # Or as described by AI (gasp):
