@@ -8,7 +8,14 @@ bamCoverage is a tool in the package "deepTools" that calculates coverage in win
 ```
 /home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/ben_scripts/2025_bamCoverage.sh
 ```
-
+on bam files in this directory:
+```
+/home/ben/projects/rrg-ben/ben/2024_cliv_allo_WGS/2025_more_allo_WGS/
+```
+and this one:
+```
+/home/ben/projects/rrg-ben/ben/2024_cliv_allo_WGS/fq/2024_allo
+```
 ```sh
 #!/bin/sh
 #SBATCH --job-name=bamCoverage
