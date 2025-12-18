@@ -5,6 +5,10 @@ directory:
 /home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/deepTools/deeptools
 ```
 bamCoverage is a tool in the package "deepTools" that calculates coverage in windows from bam files. Here is a script that runs it:
+```
+/home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/ben_scripts/2025_bamCoverage.sh
+```
+
 ```sh
 #!/bin/sh
 #SBATCH --job-name=bamCoverage
