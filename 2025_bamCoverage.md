@@ -36,280 +36,107 @@ module load StdEnv/2023 python/3.13.2
 library (ggplot2)
 library(tidyverse)
 library(reshape2) # this facilitates the overlay plot
-setwd("/Users/Shared/Previously\ Relocated\ Items/Security/projects/2024_cliv_allo_WGS/2025_allo_WGS_depth_in_windowz")
+setwd("/Users/Shared/Previously Relocated Items/Security/projects/2024_cliv_allo_WGS/2025_allo_WGS_depth_in_windowz/depth_with_bubbles_normalized")
 # read in the data 
+rm(list=ls()) # removes all variables
+
 options(scipen=999)
-# these coverages are counts from bamCoverage. I am pretty sure that they are the number of reads
-# that map to each window (in this case each is 100,000 bp long)
-# to convert to coverage per position, multiply the number of reads by the average length of
-# a pair of reads (~300bp) and then divide by the window size (100,000)
-# this provides ~22X coverage for an average count of 7500 per window, which seems correct
 
-# declare an empty df
-#standardized_depth <- data.frame(matrix(ncol = 10, nrow = 0))
-#colnames(standardized_depth) <- c('BJE3485', 'BJE3486', 'BJE3487','BJE3488', 'BJE3495', 'BJE3496','BJE3501', 'BJE3502', 'Z23732','Z23738')
+sample_vector <- c("female_allo_17A7","female_allo_17AB","female_allo_17C2","female_allo_17E2","female_BJE3487","female_BJE3488","female_BJE3501","female_BJE3502","female_camF1","female_Z23698","female_Z23702","female_Z23721","female_Z23726","female_Z23732","female_Z23733","male_allo_17A1","male_allo_1873","male_allo_1876","male_allo_18A1","male_allo_18AF","male_allo_190F","male_BJE3485","male_BJE3486","male_BJE3495","male_BJE3496","male_camM5","male_Z23701","male_Z23738","male_Z23739")
 
-depth_per_site_BJE3485 <- read.table("BJE3485_sorted_rg_dedup.bam_bamCoverage.bw", header = F)
-colnames(depth_per_site_BJE3485) <- c("contig","start","stop","depth")
-#table(as.character(sapply(depth_per_site, class)))
-dim(depth_per_site_BJE3485)
-
-
-# Standardize the depth by the mean depth per sample
-# first calculate the mean count with outliers included
-x <- mean(na.omit(depth_per_site_BJE3485$depth));x
-stdev <- sd(depth_per_site_BJE3485$depth, na.rm = TRUE); stdev
-
-# now use this mean to get rid of outliers
-depth_per_sitez <- sapply(depth_per_site_BJE3485$depth,
-                                            function(r) ifelse( (is.numeric(r))&&(r<(stdev*3)),r,NA))
-# recalculate mean
-x <- mean(na.omit(depth_per_sitez));x
-# standardize
-depth_per_site_BJE3485$standardized_depth <- sapply(depth_per_site_BJE3485$depth,
-                                                         function(r) ifelse ((is.numeric(r)),r/x,NA))
-
-
-depth_per_site_BJE3486 <- read.table("BJE3486_sorted_rg_dedup.bam_bamCoverage.bw", header = F)
-colnames(depth_per_site_BJE3486) <- c("contig","start","stop","depth")
-#table(as.character(sapply(depth_per_site, class)))
-dim(depth_per_site_BJE3486)
-
-
-# Standardize the depth by the mean depth per sample
-# first calculate the mean count with outliers included
-x <- mean(na.omit(depth_per_site_BJE3486$depth));x
-stdev <- sd(depth_per_site_BJE3486$depth, na.rm = TRUE); stdev
-
-# now use this mean to get rid of outliers
-depth_per_sitez <- sapply(depth_per_site_BJE3486$depth,
-                          function(r) ifelse( (is.numeric(r))&&(r<(stdev*3)),r,NA))
-# recalculate mean
-x <- mean(na.omit(depth_per_sitez));x
-# standardize
-depth_per_site_BJE3486$standardized_depth <- sapply(depth_per_site_BJE3486$depth,
-                                                    function(r) ifelse ((is.numeric(r)),r/x,NA))
-
-depth_per_site_BJE3487 <- read.table("BJE3487_sorted_rg_dedup.bam_bamCoverage.bw", header = F)
-colnames(depth_per_site_BJE3487) <- c("contig","start","stop","depth")
-#table(as.character(sapply(depth_per_site, class)))
-dim(depth_per_site_BJE3487)
-
-
-# Standardize the depth by the mean depth per sample
-# first calculate the mean count with outliers included
-x <- mean(na.omit(depth_per_site_BJE3487$depth));x
-stdev <- sd(depth_per_site_BJE3487$depth, na.rm = TRUE); stdev
-
-# now use this mean to get rid of outliers
-depth_per_sitez <- sapply(depth_per_site_BJE3487$depth,
-                          function(r) ifelse( (is.numeric(r))&&(r<(stdev*3)),r,NA))
-# recalculate mean
-x <- mean(na.omit(depth_per_sitez));x
-# standardize
-depth_per_site_BJE3487$standardized_depth <- sapply(depth_per_site_BJE3487$depth,
-                                                    function(r) ifelse ((is.numeric(r)),r/x,NA))
-
-
-depth_per_site_BJE3488 <- read.table("BJE3488_sorted_rg_dedup.bam_bamCoverage.bw", header = F)
-colnames(depth_per_site_BJE3488) <- c("contig","start","stop","depth")
-#table(as.character(sapply(depth_per_site, class)))
-dim(depth_per_site_BJE3488)
-
-
-# Standardize the depth by the mean depth per sample
-# first calculate the mean count with outliers included
-x <- mean(na.omit(depth_per_site_BJE3488$depth));x
-stdev <- sd(depth_per_site_BJE3488$depth, na.rm = TRUE); stdev
-
-# now use this mean to get rid of outliers
-depth_per_sitez <- sapply(depth_per_site_BJE3488$depth,
-                          function(r) ifelse( (is.numeric(r))&&(r<(stdev*3)),r,NA))
-# recalculate mean
-x <- mean(na.omit(depth_per_sitez));x
-# standardize
-depth_per_site_BJE3488$standardized_depth <- sapply(depth_per_site_BJE3488$depth,
-                                                    function(r) ifelse ((is.numeric(r)),r/x,NA))
-
-
-depth_per_site_BJE3495 <- read.table("BJE3495_sorted_rg_dedup.bam_bamCoverage.bw", header = F)
-colnames(depth_per_site_BJE3495) <- c("contig","start","stop","depth")
-#table(as.character(sapply(depth_per_site, class)))
-dim(depth_per_site_BJE3495)
-
-
-# Standardize the depth by the mean depth per sample
-# first calculate the mean count with outliers included
-x <- mean(na.omit(depth_per_site_BJE3495$depth));x
-stdev <- sd(depth_per_site_BJE3495$depth, na.rm = TRUE); stdev
-
-# now use this mean to get rid of outliers
-depth_per_sitez <- sapply(depth_per_site_BJE3495$depth,
-                          function(r) ifelse( (is.numeric(r))&&(r<(stdev*3)),r,NA))
-# recalculate mean
-x <- mean(na.omit(depth_per_sitez));x
-# standardize
-depth_per_site_BJE3495$standardized_depth <- sapply(depth_per_site_BJE3495$depth,
-                                                    function(r) ifelse ((is.numeric(r)),r/x,NA))
-
-depth_per_site_BJE3496 <- read.table("BJE3496_sorted_rg_dedup.bam_bamCoverage.bw", header = F)
-colnames(depth_per_site_BJE3496) <- c("contig","start","stop","depth")
-#table(as.character(sapply(depth_per_site, class)))
-dim(depth_per_site_BJE3496)
-
-
-# Standardize the depth by the mean depth per sample
-# first calculate the mean count with outliers included
-x <- mean(na.omit(depth_per_site_BJE3496$depth));x
-stdev <- sd(depth_per_site_BJE3496$depth, na.rm = TRUE); stdev
-
-# now use this mean to get rid of outliers
-depth_per_sitez <- sapply(depth_per_site_BJE3496$depth,
-                          function(r) ifelse( (is.numeric(r))&&(r<(stdev*3)),r,NA))
-# recalculate mean
-x <- mean(na.omit(depth_per_sitez));x
-# standardize
-depth_per_site_BJE3496$standardized_depth <- sapply(depth_per_site_BJE3496$depth,
-                                                    function(r) ifelse ((is.numeric(r)),r/x,NA))
-
-depth_per_site_BJE3501 <- read.table("BJE3501_sorted_rg_dedup.bam_bamCoverage.bw", header = F)
-colnames(depth_per_site_BJE3501) <- c("contig","start","stop","depth")
-#table(as.character(sapply(depth_per_site, class)))
-dim(depth_per_site_BJE3501)
-
-
-# Standardize the depth by the mean depth per sample
-# first calculate the mean count with outliers included
-x <- mean(na.omit(depth_per_site_BJE3501$depth));x
-stdev <- sd(depth_per_site_BJE3501$depth, na.rm = TRUE); stdev
-
-# now use this mean to get rid of outliers
-depth_per_sitez <- sapply(depth_per_site_BJE3501$depth,
-                          function(r) ifelse( (is.numeric(r))&&(r<(stdev*3)),r,NA))
-# recalculate mean
-x <- mean(na.omit(depth_per_sitez));x
-# standardize
-depth_per_site_BJE3501$standardized_depth <- sapply(depth_per_site_BJE3501$depth,
-                                                    function(r) ifelse ((is.numeric(r)),r/x,NA))
-
-depth_per_site_BJE3502 <- read.table("BJE3502_sorted_rg_dedup.bam_bamCoverage.bw", header = F)
-colnames(depth_per_site_BJE3502) <- c("contig","start","stop","depth")
-#table(as.character(sapply(depth_per_site, class)))
-dim(depth_per_site_BJE3502)
-
-
-# Standardize the depth by the mean depth per sample
-# first calculate the mean count with outliers included
-x <- mean(na.omit(depth_per_site_BJE3502$depth));x
-stdev <- sd(depth_per_site_BJE3502$depth, na.rm = TRUE); stdev
-
-# now use this mean to get rid of outliers
-depth_per_sitez <- sapply(depth_per_site_BJE3502$depth,
-                          function(r) ifelse( (is.numeric(r))&&(r<(stdev*3)),r,NA))
-# recalculate mean
-x <- mean(na.omit(depth_per_sitez));x
-# standardize
-depth_per_site_BJE3502$standardized_depth <- sapply(depth_per_site_BJE3502$depth,
-                                                    function(r) ifelse ((is.numeric(r)),r/x,NA))
+#sample_vector_onlymainland <- c("female_allo_17A7","female_allo_17AB","female_allo_17C2","female_allo_17E2","female_camF1","female_Z23698","female_Z23702","female_Z23721","female_Z23726","female_Z23732","female_Z23733","male_allo_17A1","male_allo_1873","male_allo_1876","male_allo_18A1","male_allo_18AF","male_allo_190F","male_camM5","male_Z23701","male_Z23738","male_Z23739")
 
 
 
-depth_per_site_Z23732 <- read.table("Z23732_sorted_rg_dedup.bam_bamCoverage.bw", header = F)
-colnames(depth_per_site_Z23732) <- c("contig","start","stop","depth")
-#table(as.character(sapply(depth_per_site, class)))
-dim(depth_per_site_Z23732)
+my_df_wide <- data.frame(contig=character(),
+                    start=integer(),
+                    stop=integer())
 
 
-# Standardize the depth by the mean depth per sample
-# first calculate the mean count with outliers included
-x <- mean(na.omit(depth_per_site_Z23732$depth));x
-stdev <- sd(depth_per_site_Z23732$depth, na.rm = TRUE); stdev
+# loop through each sample and make a long format df
+#for (sample in sample_vector){
+#   sample <- "female_allo_17AB"
+#    a <- read.table(paste(eval(sample),"_sorted_rg.bam_RPKMnorm_bamCoverage_10kb.bw", sep=""))
+#    a$sample <- eval(sample)
+#    colnames(a) <- c("contig","start","stop","depth","sample")
+#    my_df <- rbind(my_df,a)
+#}  
 
-# now use this mean to get rid of outliers
-depth_per_sitez <- sapply(depth_per_site_Z23732$depth,
-                          function(r) ifelse( (is.numeric(r))&&(r<(stdev*3)),r,NA))
-# recalculate mean
-x <- mean(na.omit(depth_per_sitez));x
-# standardize
-depth_per_site_Z23732$standardized_depth <- sapply(depth_per_site_Z23732$depth,
-                                                   function(r) ifelse ((is.numeric(r)),r/x,NA))
+#head(my_df)
+#dim(my_df)
+
+# loop through each sample and make a wide format df
+for (sample in sample_vector){
+  # sample <- "female_allo_17A7"
+  #sample <- "male_allo_18AF"
+  a <- read.table(paste(eval(sample),"_sorted_rg.bam_RPKMnorm_bamCoverage_10kb.bw", sep=""))
+  #a$sample <- eval(sample)
+  colnames(a) <- c("contig","start","stop",paste(eval(sample),"_depth", sep=""))
+  
+  # broken below ----
+  # here need to find places where consecutive bins have the same number of reads overlapping, because they will be merged.
+  # for example: male_allo_18AF_sorted_rg.bam_RPKMnorm_bamCoverage_10kb.bw:tig00000003	20000	40000	0.0394696
+  # Create an empty tibble to store the new data
+  new_df <- tibble()
+  expected_diff <- 10000
+# Loop through each row of the original dataframe
+  for (i in 1:nrow(a)) {
+    # Add the current row to the new dataframe
+    # Check the difference between columns for the current row
+    current_diff <- a$stop[i] - a$start[i]
+    print(paste(eval(sample)," ",eval(i)," ",eval(current_diff),sep=""))
+      # If the difference is not 10000, add a new row below
+      if (current_diff != expected_diff) { # there is a row with merged bins
+        for (j in 1:ceiling(current_diff/expected_diff)) { #for the number of merged bins
+          extra_row <- a[i,] # make a row
+          extra_row$start <- a$start[i] + (expected_diff*j) - expected_diff # adjust the start
+          extra_row$stop <- a$start[i] + (expected_diff*j)  # adjust the stop
+          new_df <- bind_rows(new_df, extra_row) #add this to a new df
+        }  
+      }else{ # there is not a row with merged bins
+          extra_row <- a[i,]
+          new_df <- bind_rows(new_df, extra_row)
+      }
+  }
+ # write to a new file
+ write.table(new_df, file = paste(eval(sample),"_sorted_rg.bam_RPKMnorm_bamCoverage_10kb_fixedrowz.bw", sep=""), sep = "\t", row.names = FALSE) 
+##  my_df_wide <- merge(my_df_wide, new_df, by=c("contig","start","stop"), all=T) # merge the corrected df
+  #my_df_wide <- full_join(my_df_wide, new_df, by = c("contig","start","stop")) # merge the corrected df
+#  my_df_wide <- merge(my_df_wide, a, by=c("contig","start","stop"), all=T) # merge the corrected df
+  # check tig00008642  
+}
+  
 
 
-depth_per_site_Z23738 <- read.table("Z23738_sorted_rg_dedup.bam_bamCoverage.bw", header = F)
-colnames(depth_per_site_Z23738) <- c("contig","start","stop","depth")
-#table(as.character(sapply(depth_per_site, class)))
-dim(depth_per_site_Z23738)
+#### NEED TO RELOAD DATA HERE ----
 
+I need to now open up the new files where the depth values have been modified to have one window per row instead of concatenated windows in some rows that had consecutively identical depths across consecutive windows.  
+  
+dim(my_df_wide)
 
-# Standardize the depth by the mean depth per sample
-# first calculate the mean count with outliers included
-x <- mean(na.omit(depth_per_site_Z23738$depth));x
-stdev <- sd(depth_per_site_Z23738$depth, na.rm = TRUE); stdev
+#head(my_df_wide)
+#dim(my_df_wide)
 
-# now use this mean to get rid of outliers
-depth_per_sitez <- sapply(depth_per_site_Z23738$depth,
-                          function(r) ifelse( (is.numeric(r))&&(r<(stdev*3)),r,NA))
-# recalculate mean
-x <- mean(na.omit(depth_per_sitez));x
-# standardize
-depth_per_site_Z23738$standardized_depth <- sapply(depth_per_site_Z23738$depth,
-                                                   function(r) ifelse ((is.numeric(r)),r/x,NA))
+#library(dplyr)
 
-
-library(dplyr)
-# malez_first
-df3 <- full_join(depth_per_site_BJE3485, depth_per_site_BJE3486, by=c('contig'='contig', 'start'='start', 'stop'='stop'))
-colnames(df3) <- c('contig','start','stop','BJE3485_depth','BJE3485_stdepth','BJE3486_depth','BJE3486_stdepth')
-df4 <- full_join(df3, depth_per_site_BJE3495, by=c('contig'='contig', 'start'='start', 'stop'='stop'))
-colnames(df4) <- c('contig','start','stop','BJE3485_depth','BJE3485_stdepth','BJE3486_depth','BJE3486_stdepth',
-                   'BJE3495_depth','BJE3495_stdepth')
-df5 <- full_join(df4, depth_per_site_BJE3496, by=c('contig'='contig', 'start'='start', 'stop'='stop'))
-colnames(df5) <- c('contig','start','stop','BJE3485_depth','BJE3485_stdepth','BJE3486_depth','BJE3486_stdepth',
-                   'BJE3495_depth','BJE3495_stdepth','BJE3496_depth','BJE3496_stdepth')
-df6 <- full_join(df5, depth_per_site_Z23738, by=c('contig'='contig', 'start'='start', 'stop'='stop'))
-colnames(df6) <- c('contig','start','stop','BJE3485_depth','BJE3485_stdepth','BJE3486_depth','BJE3486_stdepth',
-                   'BJE3495_depth','BJE3495_stdepth','BJE3496_depth','BJE3496_stdepth',
-                   'Z23738_depth','Z23738_stdepth')
-
-# now add femalez
-df7 <- full_join(df6, depth_per_site_BJE3487, by=c('contig'='contig', 'start'='start', 'stop'='stop'))
-colnames(df7) <- c('contig','start','stop','BJE3485_depth','BJE3485_stdepth','BJE3486_depth','BJE3486_stdepth',
-                   'BJE3495_depth','BJE3495_stdepth','BJE3496_depth','BJE3496_stdepth',
-                   'Z23738_depth','Z23738_stdepth','BJE3487_depth','BJE3487_stdepth')
-
-df8 <- full_join(df7, depth_per_site_BJE3488, by=c('contig'='contig', 'start'='start', 'stop'='stop'))
-colnames(df8) <- c('contig','start','stop','BJE3485_depth','BJE3485_stdepth','BJE3486_depth','BJE3486_stdepth',
-                   'BJE3495_depth','BJE3495_stdepth','BJE3496_depth','BJE3496_stdepth',
-                   'Z23738_depth','Z23738_stdepth','BJE3487_depth','BJE3487_stdepth',
-                   'BJE3488_depth','BJE3488_stdepth')
-
-df9 <- full_join(df8, depth_per_site_BJE3501, by=c('contig'='contig', 'start'='start', 'stop'='stop'))
-colnames(df9) <- c('contig','start','stop','BJE3485_depth','BJE3485_stdepth','BJE3486_depth','BJE3486_stdepth',
-                   'BJE3495_depth','BJE3495_stdepth','BJE3496_depth','BJE3496_stdepth',
-                   'Z23738_depth','Z23738_stdepth','BJE3487_depth','BJE3487_stdepth',
-                   'BJE3488_depth','BJE3488_stdepth','BJE3501_depth','BJE3501_stdepth')
-
-df10 <- full_join(df9, depth_per_site_BJE3502, by=c('contig'='contig', 'start'='start', 'stop'='stop'))
-colnames(df10) <- c('contig','start','stop','BJE3485_depth','BJE3485_stdepth','BJE3486_depth','BJE3486_stdepth',
-                   'BJE3495_depth','BJE3495_stdepth','BJE3496_depth','BJE3496_stdepth',
-                   'Z23738_depth','Z23738_stdepth','BJE3487_depth','BJE3487_stdepth',
-                   'BJE3488_depth','BJE3488_stdepth','BJE3501_depth','BJE3501_stdepth',
-                   'BJE3502_depth','BJE3502_stdepth')
-
-all_of_em <- full_join(df10, depth_per_site_Z23732, by=c('contig'='contig', 'start'='start', 'stop'='stop'))
-colnames(all_of_em) <- c('contig','start','stop','BJE3485_depth','BJE3485_stdepth','BJE3486_depth','BJE3486_stdepth',
-                    'BJE3495_depth','BJE3495_stdepth','BJE3496_depth','BJE3496_stdepth',
-                    'Z23738_depth','Z23738_stdepth','BJE3487_depth','BJE3487_stdepth',
-                    'BJE3488_depth','BJE3488_stdepth','BJE3501_depth','BJE3501_stdepth',
-                    'BJE3502_depth','BJE3502_stdepth','Z23732_depth','Z23732_stdepth')
-
+# all ----
 # calculate the F-M difference in mean depth 
-all_of_em$mean_diff_M_minus_F <- rowMeans(all_of_em[ , c(5,7,9,11,13)], na.rm=TRUE) -
-  rowMeans(all_of_em[ , c(15,17,19,21,23)], na.rm=TRUE)
-all_of_em$mean_malez <- rowMeans(all_of_em[ , c(5,7,9,11,13)], na.rm=TRUE) 
-all_of_em$mean_femalez <- rowMeans(all_of_em[ , c(15,17,19,21,23)], na.rm=TRUE)
+my_df_wide$mean_diff_F_minus_M <- rowMeans(my_df_wide[ , c(4:18)], na.rm=TRUE) -
+  rowMeans(my_df_wide[ , c(19:32)], na.rm=TRUE)
+my_df_wide$mean_femalez <- rowMeans(my_df_wide[ , c(4:18)], na.rm=TRUE)
+my_df_wide$mean_malez <- rowMeans(my_df_wide[ , c(19:32)], na.rm=TRUE) 
 
-all_of_em_noNAs <- all_of_em[complete.cases(all_of_em), ]
+# Or only mainland ----
+my_df_wide$mean_diff_F_minus_M_onlymainland <- rowMeans(my_df_wide[ , c(4:7,12:18)], na.rm=TRUE) -
+  rowMeans(my_df_wide[ , c(19:24,29:32)], na.rm=TRUE)
+my_df_wide$mean_femalez_onlymainland <- rowMeans(my_df_wide[ , c(4:7,12:18)], na.rm=TRUE)
+my_df_wide$mean_malez_onlymainland <- rowMeans(my_df_wide[ , c(19:24,29:32)], na.rm=TRUE) 
+
+# Or only Bioko ----
+my_df_wide$mean_diff_F_minus_M_onlybioko <- rowMeans(my_df_wide[ , c(8:11)], na.rm=TRUE) -
+  rowMeans(my_df_wide[ , c(25:28)], na.rm=TRUE)
+my_df_wide$mean_femalez_onlybioko <- rowMeans(my_df_wide[ , c(8:11)], na.rm=TRUE)
+my_df_wide$mean_malez_onlybioko <- rowMeans(my_df_wide[ , c(25:28)], na.rm=TRUE) 
 
 
 #all_of_em_noNAs %>% select(contig, mean_diff_F_minus_M_notads, start) %>%
@@ -338,7 +165,7 @@ library(latticeExtra)
 manhattan.plot<-function(chr, pos, pvalue, 
                          sig.level=NA, annotate=NULL, ann.default=list(),
                          should.thin=T, thin.pos.places=2, thin.logp.places=2, 
-                         xlab="Chromosome", ylab="Mean Depth Diff (M-F)",
+                         xlab="Chromosome", ylab="Mean Depth Diff (F-M)",
                          col=c("gray","darkgray"), panel.extra=NULL, pch=20, cex=0.8,...) {
   
   if (length(chr)==0) stop("chromosome vector is empty")
@@ -477,8 +304,10 @@ manhattan.plot<-function(chr, pos, pvalue,
   #make sure the y-lim covers the range (plus a bit more to look nice)
   prepanel.chr<-function(x,y,...) { 
     A<-list();
-    maxy<-ceiling(max(y, ifelse(!is.na(sig.level), sig.level, 0)))+.1;
-    miny<-floor(min(y, ifelse(!is.na(sig.level), sig.level, 0)))-.1;
+    #maxy<-ceiling(max(y, ifelse(!is.na(sig.level), sig.level, 0)))+.1;
+    #miny<-floor(min(y, ifelse(!is.na(sig.level), sig.level, 0)))-.1;
+    maxy<-max(my_df_wide$mean_diff_F_minus_M, na.rm=T)+1;
+    miny<-min(my_df_wide$mean_diff_F_minus_M, na.rm=T)-1;
     A$ylim=c(miny,maxy);
     A;
   }
@@ -538,7 +367,7 @@ manhattan.plot<-function(chr, pos, pvalue,
 chromosome.plot<-function(chr, pos, pvalue, 
                           sig.level=NA, annotate=NULL, ann.default=list(),
                           should.thin=T, thin.pos.places=2, thin.logp.places=2, 
-                          xlab="Mb", ylab="Mean depth diff (M-F)",
+                          xlab="Mb", ylab="Mean depth diff (F-M)",
                           col=c("gray","darkgray"), panel.extra=NULL, pch=20, cex=0.8,...) {
   
   if (length(chr)==0) stop("chromosome vector is empty")
@@ -768,7 +597,7 @@ theme.novpadding <- list(
 chromosome.plot.no.thin<-function(chr, pos, pvalue, 
                                   sig.level=NA, annotate=NULL, ann.default=list(),
                                   should.thin=F, thin.pos.places=2, thin.logp.places=2, 
-                                  xlab="Mb", ylab="Mean Depth Diff (M-F)",
+                                  xlab="Mb", ylab="Mean Depth Diff (F-M)",
                                   col=c("gray","darkgray"), panel.extra=NULL, pch=20, cex=0.8,...) {
   
   if (length(chr)==0) stop("chromosome vector is empty")
@@ -974,18 +803,83 @@ chromosome.plot.no.thin<-function(chr, pos, pvalue,
   );
 }
 
-# get rid of tig00007285 because this is mtDNA
-all_of_em_noNAs <- all_of_em_noNAs[all_of_em_noNAs$contig != "tig00007285",]
+# get rid of tig00007285 because this is mtDNA ----
+my_df_wide <- my_df_wide[my_df_wide$contig != "tig00007285",]
+all_of_em_noNAs <- my_df_wide[complete.cases(my_df_wide), ]
+
+dim(all_of_em_noNAs)
+
 # change contig names
-all_of_em_noNAs <- as.data.frame(sapply(all_of_em_noNAs,function(x) {x <- gsub("tig0000","c",x)}))
-all_of_em_noNAs <- as.data.frame(sapply(all_of_em_noNAs,function(x) {x <- gsub("tig000","c",x)}))
+#all_of_em_noNAs <- as.data.frame(sapply(all_of_em_noNAs,function(x) {x <- gsub("tig0000","c",x)}))
+#all_of_em_noNAs <- as.data.frame(sapply(all_of_em_noNAs,function(x) {x <- gsub("tig000","c",x)}))
 # get variables in proper format
-all_of_em_noNAs$start <- as.numeric(all_of_em_noNAs$start)
-all_of_em_noNAs$mean_diff_M_minus_F <- as.numeric(all_of_em_noNAs$mean_diff_M_minus_F)
-all_of_em_noNAs$mean_femalez <- as.numeric(all_of_em_noNAs$mean_femalez)
-all_of_em_noNAs$mean_malez <- as.numeric(all_of_em_noNAs$mean_malez)
+#all_of_em_noNAs$start <- as.numeric(all_of_em_noNAs$start)
+#all_of_em_noNAs$mean_diff_M_minus_F <- as.numeric(all_of_em_noNAs$mean_diff_M_minus_F)
+#all_of_em_noNAs$mean_femalez <- as.numeric(all_of_em_noNAs$mean_femalez)
+#all_of_em_noNAs$mean_malez <- as.numeric(all_of_em_noNAs$mean_malez)
 
 
+# plot all ----
+F_minus_M_allo_depth_plot <- manhattan.plot(factor(my_df_wide$contig), my_df_wide$start, 
+                                            my_df_wide$mean_diff_F_minus_M)#,
+
+F_minus_M_allo_depth_plot <- manhattan.plot(factor(all_of_em_noNAs$contig), all_of_em_noNAs$start, 
+                                            all_of_em_noNAs$mean_diff_F_minus_M)#,
+
+# ylim= c(0,12),xlab = "",
+# par.settings = theme.novpadding)#,
+#panel=function(x, y, ...){
+# panel.rect(xleft=695, ybottom=0,
+#           xright=733, ytop=10, alpha=0.3, col="light blue")
+#panel.text(275,9,labels=expression(italic("X. allofraseri")),fontsize=14)})
+
+jpeg("./F_minus_M_allo_depth_plot_withoutliers_10kb_noNAs.jpg",w=300, h=3.0, units ="in", bg="transparent", res = 200)
+  F_minus_M_allo_depth_plot
+dev.off()
+
+# plot onlymainland ----
+F_minus_M_allo_depth_plot_onlymainland <- manhattan.plot(factor(my_df_wide$contig), my_df_wide$start, 
+                                            my_df_wide$mean_diff_F_minus_M_onlymainland)#,
+jpeg("./F_minus_M_allo_depth_plot_withoutliers_10kb_onlymainland.jpg",w=300, h=3.0, units ="in", bg="transparent", res = 200)
+  F_minus_M_allo_depth_plot_onlymainland
+dev.off()
+
+# plot onlybioko ----
+F_minus_M_allo_depth_plot_onlybioko <- manhattan.plot(factor(my_df_wide$contig), my_df_wide$start, 
+                                                         my_df_wide$mean_diff_F_minus_M_onlybioko)#,
+jpeg("./F_minus_M_allo_depth_plot_withoutliers_10kb_onlybioko.jpg",w=300, h=3.0, units ="in", bg="transparent", res = 200)
+  F_minus_M_allo_depth_plot_onlybioko
+dev.off()
+
+
+# Scatter of mainland vs bioko
+library(ggplot2)
+
+# Create a basic scatter plot
+y <- ggplot(data = my_df_wide, aes(x = mean_diff_F_minus_M_onlymainland, y = mean_diff_F_minus_M_onlybioko)) +
+  geom_point() +
+  theme_classic(base_size = 16) 
+jpeg("./mainland_vs_bioko.jpg",w=5, h=5.0, units ="in", bg="transparent", res = 200)
+  y
+dev.off()
+
+
+View(my_df_wide)
+min(my_df_wide$mean_diff_F_minus_M, na.rm=T)
+max(my_df_wide$mean_diff_F_minus_M, na.rm=T)
+
+# Notez
+# tig00009267_80000_90000 - no match in XL - high F-M in mainland but not bioko
+# tig00011059_7300000_7310000 is 18S rDNA - high F-M in bioko but not mainland
+
+# tig00008522:3580000-3600000 -zc3h6 - low F-M in all # no known sex determining function
+
+
+my_df_wide_onlymalecoverage <- my_df_wide[my_df_wide$mean_femalez == 0,]
+# get rid of rows with no data
+my_df_wide_onlymalecoverage <- my_df_wide_onlymalecoverage[rowSums(is.na(my_df_wide_onlymalecoverage)) != ncol(my_df_wide_onlymalecoverage), ]
+dim(my_df_wide_onlymalecoverage)
+View(my_df_wide_onlymalecoverage)
 
 
 # plot ----
@@ -998,10 +892,45 @@ M_minus_F_allo_depth_plot <- manhattan.plot(factor(all_of_em_noNAs$contig), all_
                                             #           xright=733, ytop=10, alpha=0.3, col="light blue")
                                           #panel.text(275,9,labels=expression(italic("X. allofraseri")),fontsize=14)})
 
-jpeg("./M_minus_F_allo_depth_plot.jpg",w=500, h=3.0, units ="in", bg="transparent", res = 200)
+jpeg("./M_minus_F_allo_depth_plot_withoutliers_10kb.jpg",w=300, h=3.0, units ="in", bg="transparent", res = 200)
   M_minus_F_allo_depth_plot
 dev.off()
 
+# Weirdonez
+SexChr <- my_df_wide[my_df_wide$contig == "tig00010978",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "tig00005103",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "tig00006777",]
+
+View(SexChr)
+
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10277",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c4422",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8534",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c9304",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c9266",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c9267",]
+
+# Chr7L bits
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c11029",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10976",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10978",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c6146",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8587",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8582",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c9979",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c9681",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c1504",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8580",]
+
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c12378",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c6886",]
+
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c5690",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c6777",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10671",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10672",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8586",]
+SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8584",]
 
 
 SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c11059",]
@@ -1019,20 +948,22 @@ SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c7399",]
 SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c9267",]
 SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8579",]
 SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c7537",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c6777",]
 SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c1724",]
 
 
 
 
 # narrow down region
-#SexChr <- SexChr[((SexChr$pos > 2300000)&(SexChr$pos < 2700000)),]
-Contig_focus_plot <- chromosome.plot.no.thin(factor(SexChr$contig),SexChr$start,SexChr$mean_diff_M_minus_F)
+# SexChr <- SexChr[((SexChr$start > 1100000)&(SexChr$start < 1300000)),]
+# SexChr <- SexChr[(SexChr$start < 200000),]
+Contig_focus_plot <- chromosome.plot.no.thin(factor(SexChr$contig),SexChr$start,SexChr$mean_diff_F_minus_M)
                                               
 
-jpeg("./Contig_focus_plot_c7399_focus.jpg",w=7, h=3.0, units ="in", bg="transparent", res = 200)
+jpeg("./Contig_focus_plot_tig00006777_includeoutliers_10kbfocus_<200kb.jpg",w=7, h=3.0, units ="in", bg="transparent", res = 200)
   Contig_focus_plot
 dev.off()
+
+
 
 View(SexChr)
 ```
