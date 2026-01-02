@@ -145,9 +145,10 @@ module load StdEnv/2023 star/2.7.11b subread/2.0.6 samtools
 # use --countReadPairs to count read pairs instead of reads
 # use -C to prevent counting of chimeric reads
 # -T is the number of threads
+
 featureCounts -T 4 -s 0 -p --countReadPairs -C \
-  -a /home/ben/projects/rrg-ben/ben/2021_XL_v10_refgenome/XENLA_10.1_GCF_XBmodels.gtf \
-  -o ${2} \
+  -a /home/ben/projects/rrg-ben/ben/2024_allo_muel_RNAseq/de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.gtf \
+  -o ${1}_countz \
   ${1}
 ```
 
