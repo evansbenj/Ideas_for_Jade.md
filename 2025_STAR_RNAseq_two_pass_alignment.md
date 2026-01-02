@@ -113,8 +113,13 @@ STAR --runMode alignReads \
      --outSAMattributes Standard \
      --readFilesCommand zcat
 ```
+# make a gtf file with stringtie
+```
+module load StdEnv/2023 stringtie/3.0.1
+stringtie X_allofraseri_tad13_S1_L001__allo_denovotranscriptome_sorted_rg.bam -o X_allofraseri_tad13_S1_L001__allo_denovotranscriptome_sorted_rg.bam.gtf
+```
 
-# make a gtf file
+# make a gtf file (don't do it this way)
 ```
 cut -f2,3 ../de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.dict > ../de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.gtf
 sed -i 's/SN://g'  ../de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.gtf
