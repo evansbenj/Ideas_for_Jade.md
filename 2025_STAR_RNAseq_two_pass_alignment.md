@@ -120,7 +120,8 @@ cut -f2,3 ../de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.
 sed -i 's/SN://g'  ../de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.gtf
 sed -i 's/	LN:/	ben	region	1	/g'  ../de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.gtf
 sed -i ':a;N;$!ba;s/\n/ .       .       .       .\n/g'  ../de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.gtf
-awk -v OFS='\t'  '{ print $1, $2, $3, $4, $5, $6, $7, $8, $1}' /home/ben/projects/rrg-ben/ben/2024_allo_muel_RNAseq/de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.gtf > /home/ben/projects/rrg-ben/ben/2024_allo_muel_RNAseq/de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity_new.gtf
+awk -v OFS='\t'  '{ print $1, $2, $3, $4, $5, $6, $7, $8, "geneid #"$1"#"}' /home/ben/projects/rrg-ben/ben/2024_allo_muel_RNAseq/de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.gtf > /home/ben/projects/rrg-ben/ben/2024_allo_muel_RNAseq/de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity_new.gtf
+sed -i 's/#/"/g' /home/ben/projects/rrg-ben/ben/2024_allo_muel_RNAseq/de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity_new.gtf
 ```
 
 # Counts
