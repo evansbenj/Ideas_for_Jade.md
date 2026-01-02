@@ -114,6 +114,14 @@ STAR --runMode alignReads \
      --readFilesCommand zcat
 ```
 
+# make a gtf file
+```
+cut -f2,3 ../de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.dict > ../de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.gtf
+sed -i 's/SN://g'  ../de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.gtf
+sed -i 's/	LN:/	ben	region	1	/g'  ../de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.gtf
+sed -i ':a;N;$!ba;s/\n/ .       .       .       .\n/g'  ../de_novo_assembly_trinity/allo_trinity_assembly_all_batches.Trinity.gtf
+```
+
 # Counts
 
 ```
