@@ -43,7 +43,6 @@ rm(list=ls()) # removes all variables
 options(scipen=999)
 
 sample_vector <- c("female_allo_17A7","female_allo_17AB","female_allo_17C2","female_allo_17E2","female_BJE3487","female_BJE3488","female_BJE3501","female_BJE3502","female_camF1","female_Z23698","female_Z23702","female_Z23721","female_Z23726","female_Z23732","female_Z23733","male_allo_17A1","male_allo_1873","male_allo_1876","male_allo_18A1","male_allo_18AF","male_allo_190F","male_BJE3485","male_BJE3486","male_BJE3495","male_BJE3496","male_camM5","male_Z23701","male_Z23738","male_Z23739")
-
 #sample_vector_onlymainland <- c("female_allo_17A7","female_allo_17AB","female_allo_17C2","female_allo_17E2","female_camF1","female_Z23698","female_Z23702","female_Z23721","female_Z23726","female_Z23732","female_Z23733","male_allo_17A1","male_allo_1873","male_allo_1876","male_allo_18A1","male_allo_18AF","male_allo_190F","male_camM5","male_Z23701","male_Z23738","male_Z23739")
 
 
@@ -65,15 +64,13 @@ my_df_wide <- data.frame(contig=character(),
 #head(my_df)
 #dim(my_df)
 
-# loop through each sample and make a wide format df
+# loop through each sample and correct merged rows
 for (sample in sample_vector){
   # sample <- "female_allo_17A7"
   #sample <- "male_allo_18AF"
   a <- read.table(paste(eval(sample),"_sorted_rg.bam_RPKMnorm_bamCoverage_10kb.bw", sep=""))
   #a$sample <- eval(sample)
   colnames(a) <- c("contig","start","stop",paste(eval(sample),"_depth", sep=""))
-  
-  # broken below ----
   # here need to find places where consecutive bins have the same number of reads overlapping, because they will be merged.
   # for example: male_allo_18AF_sorted_rg.bam_RPKMnorm_bamCoverage_10kb.bw:tig00000003	20000	40000	0.0394696
   # Create an empty tibble to store the new data
@@ -106,18 +103,31 @@ for (sample in sample_vector){
   # check tig00008642  
 }
   
-
-
-#### NEED TO RELOAD DATA HERE ----
-
-I need to now open up the new files where the depth values have been modified to have one window per row instead of concatenated windows in some rows that had consecutively identical depths across consecutive windows.  
+  
   
 dim(my_df_wide)
 
-#head(my_df_wide)
-#dim(my_df_wide)
+# Now read in the fixed files
+# loop through each sample and make a wide format df
+for (sample in sample_vector){
+  # sample <- "female_allo_17A7"
+  #sample <- "male_allo_18AF"
+  a <- read.table(paste(eval(sample),"_sorted_rg.bam_RPKMnorm_bamCoverage_10kb_fixedrowz.bw.txt", sep=""), header=T)
+  #a$sample <- eval(sample)
+  #colnames(a) <- c("contig","start","stop",paste(eval(sample),"_depth", sep=""))
+  my_df_wide <- merge(my_df_wide, a, by=c("contig","start","stop"), all=T) # merge the corrected df
+}
+
+
+
+head(my_df_wide)
+dim(my_df_wide)
 
 #library(dplyr)
+
+# use medians instead of means to reduce the effect of outliers
+# rowMedians(x, rows = NULL, cols = NULL, na.rm = FALSE, dim. = dim(x),
+#           ..., useNames = TRUE)
 
 # all ----
 # calculate the F-M difference in mean depth 
@@ -138,6 +148,26 @@ my_df_wide$mean_diff_F_minus_M_onlybioko <- rowMeans(my_df_wide[ , c(8:11)], na.
 my_df_wide$mean_femalez_onlybioko <- rowMeans(my_df_wide[ , c(8:11)], na.rm=TRUE)
 my_df_wide$mean_malez_onlybioko <- rowMeans(my_df_wide[ , c(25:28)], na.rm=TRUE) 
 
+# also do medians
+library(matrixStats)
+# all ----
+# calculate the F-M difference in mean depth 
+my_df_wide$median_diff_F_minus_M <- rowMedians(as.matrix(my_df_wide[ , c(4:18)]), na.rm=TRUE) -
+  rowMedians(as.matrix(my_df_wide[ , c(19:32)]), na.rm=TRUE)
+my_df_wide$mean_femalez <- rowMedians(as.matrix(my_df_wide[ , c(4:18)]), na.rm=TRUE)
+my_df_wide$mean_malez <- rowMedians(as.matrix(my_df_wide[ , c(19:32)]), na.rm=TRUE) 
+
+# Or only mainland ----
+my_df_wide$median_diff_F_minus_M_onlymainland <- rowMedians(as.matrix(my_df_wide[ , c(4:7,12:18)]), na.rm=TRUE) -
+  rowMedians(as.matrix(my_df_wide[ , c(19:24,29:32)]), na.rm=TRUE)
+my_df_wide$median_femalez_onlymainland <- rowMedians(as.matrix(my_df_wide[ , c(4:7,12:18)]), na.rm=TRUE)
+my_df_wide$median_malez_onlymainland <- rowMedians(as.matrix(my_df_wide[ , c(19:24,29:32)]), na.rm=TRUE) 
+
+# Or only Bioko ----
+my_df_wide$median_diff_F_minus_M_onlybioko <- rowMedians(as.matrix(my_df_wide[ , c(8:11)]), na.rm=TRUE) -
+  rowMedians(as.matrix(my_df_wide[ , c(25:28)]), na.rm=TRUE)
+my_df_wide$median_femalez_onlybioko <- rowMedians(as.matrix(my_df_wide[ , c(8:11)]), na.rm=TRUE)
+my_df_wide$median_malez_onlybioko <- rowMedians(as.matrix(my_df_wide[ , c(25:28)]), na.rm=TRUE) 
 
 #all_of_em_noNAs %>% select(contig, mean_diff_F_minus_M_notads, start) %>%
 #  pivot_longer(., cols = c(mean_diff_F_minus_M_notads), names_to = "Var", values_to = "Val") %>%
@@ -808,7 +838,7 @@ my_df_wide <- my_df_wide[my_df_wide$contig != "tig00007285",]
 all_of_em_noNAs <- my_df_wide[complete.cases(my_df_wide), ]
 
 dim(all_of_em_noNAs)
-
+dim(my_df_wide)
 # change contig names
 #all_of_em_noNAs <- as.data.frame(sapply(all_of_em_noNAs,function(x) {x <- gsub("tig0000","c",x)}))
 #all_of_em_noNAs <- as.data.frame(sapply(all_of_em_noNAs,function(x) {x <- gsub("tig000","c",x)}))
@@ -819,23 +849,26 @@ dim(all_of_em_noNAs)
 #all_of_em_noNAs$mean_malez <- as.numeric(all_of_em_noNAs$mean_malez)
 
 
-# plot all ----
-F_minus_M_allo_depth_plot <- manhattan.plot(factor(my_df_wide$contig), my_df_wide$start, 
+# plot all mean diff ----
+F_minus_M_allo_meandiff_depth_plot <- manhattan.plot(factor(my_df_wide$contig), my_df_wide$start, 
                                             my_df_wide$mean_diff_F_minus_M)#,
 
-F_minus_M_allo_depth_plot <- manhattan.plot(factor(all_of_em_noNAs$contig), all_of_em_noNAs$start, 
-                                            all_of_em_noNAs$mean_diff_F_minus_M)#,
+# plot all mean diff ----
+F_minus_M_allo_mediandiff_depth_plot <- manhattan.plot(factor(my_df_wide$contig), my_df_wide$start, 
+                                            my_df_wide$median_diff_F_minus_M)#,
 
-# ylim= c(0,12),xlab = "",
-# par.settings = theme.novpadding)#,
-#panel=function(x, y, ...){
-# panel.rect(xleft=695, ybottom=0,
-#           xright=733, ytop=10, alpha=0.3, col="light blue")
-#panel.text(275,9,labels=expression(italic("X. allofraseri")),fontsize=14)})
 
-jpeg("./F_minus_M_allo_depth_plot_withoutliers_10kb_noNAs.jpg",w=300, h=3.0, units ="in", bg="transparent", res = 200)
-  F_minus_M_allo_depth_plot
+
+jpeg("./F_minus_M_allo_meandiff_depth_plot_10kb.jpg",w=300, h=3.0, units ="in", bg="transparent", res = 200)
+  F_minus_M_allo_meandiff_depth_plot
 dev.off()
+
+jpeg("./F_minus_M_allo_mediandiff_depth_plot_10kb.jpg",w=300, h=3.0, units ="in", bg="transparent", res = 200)
+  F_minus_M_allo_mediandiff_depth_plot
+dev.off()
+
+
+View(my_df_wide)
 
 # plot onlymainland ----
 F_minus_M_allo_depth_plot_onlymainland <- manhattan.plot(factor(my_df_wide$contig), my_df_wide$start, 
@@ -856,7 +889,7 @@ dev.off()
 library(ggplot2)
 
 # Create a basic scatter plot
-y <- ggplot(data = my_df_wide, aes(x = mean_diff_F_minus_M_onlymainland, y = mean_diff_F_minus_M_onlybioko)) +
+y <- ggplot(data = my_df_wide, aes(x = median_diff_F_minus_M_onlymainland, y = median_diff_F_minus_M_onlybioko)) +
   geom_point() +
   theme_classic(base_size = 16) 
 jpeg("./mainland_vs_bioko.jpg",w=5, h=5.0, units ="in", bg="transparent", res = 200)
@@ -897,73 +930,63 @@ jpeg("./M_minus_F_allo_depth_plot_withoutliers_10kb.jpg",w=300, h=3.0, units ="i
 dev.off()
 
 # Weirdonez
+SexChr <- my_df_wide[my_df_wide$contig == "tig00011059",] # this includes 18S rDNA
+SexChr <- my_df_wide[my_df_wide$contig == "tig00008640",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00009533",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00006777",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00011479",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00008522",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00000697",]
 SexChr <- my_df_wide[my_df_wide$contig == "tig00010978",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "tig00005103",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "tig00006777",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00005103",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00007523",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00007559",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00008322",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00008988",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00000216",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00004247",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00004787",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00004937",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00005278",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00007882",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00009681",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00010342",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00010588",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00010385",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00010638",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00010774",]
 
-View(SexChr)
+SexChr <- my_df_wide[my_df_wide$contig == "tig00011059",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00011782",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00011811",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00009379",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00008278",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00009515",]
 
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10277",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c4422",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8534",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c9304",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c9266",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c9267",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00005092",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00003683",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00008584",]
 
-# Chr7L bits
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c11029",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10976",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10978",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c6146",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8587",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8582",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c9979",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c9681",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c1504",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8580",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00005199",]
+SexChr <- my_df_wide[my_df_wide$contig == "tig00009996",]
 
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c12378",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c6886",]
-
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c5690",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c6777",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10671",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10672",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8586",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8584",]
-
-
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c11059",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10978",] # carries foxi2.L
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10680",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10638",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10588",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10461",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10385",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10342",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c10341",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c4422",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c7519",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c7399",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c9267",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c8579",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c7537",]
-SexChr <- all_of_em_noNAs[all_of_em_noNAs$contig == "c1724",]
-
-
+SexChr <- my_df_wide[my_df_wide$contig == "tig00008985",]
 
 
 # narrow down region
-# SexChr <- SexChr[((SexChr$start > 1100000)&(SexChr$start < 1300000)),]
+# SexChr <- SexChr[((SexChr$start > 140000)&(SexChr$start < 280000)),]
 # SexChr <- SexChr[(SexChr$start < 200000),]
-Contig_focus_plot <- chromosome.plot.no.thin(factor(SexChr$contig),SexChr$start,SexChr$mean_diff_F_minus_M)
+Contig_focus_plot <- chromosome.plot.no.thin(factor(SexChr$contig),SexChr$start,SexChr$median_diff_F_minus_M)
+Contig_focus_plot <- chromosome.plot.no.thin(factor(SexChr$contig),SexChr$start,SexChr$median_diff_F_minus_M_onlymainland);Contig_focus_plot
+Contig_focus_plot <- chromosome.plot.no.thin(factor(SexChr$contig),SexChr$start,SexChr$median_diff_F_minus_M_onlybioko);Contig_focus_plot
                                               
 
-jpeg("./Contig_focus_plot_tig00006777_includeoutliers_10kbfocus_<200kb.jpg",w=7, h=3.0, units ="in", bg="transparent", res = 200)
+jpeg("./tig00009996_mediandif_10kbfocus.jpg",w=7, h=3.0, units ="in", bg="transparent", res = 200)
   Contig_focus_plot
 dev.off()
 
 
 
 View(SexChr)
+
 ```
