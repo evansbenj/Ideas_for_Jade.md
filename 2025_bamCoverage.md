@@ -31,7 +31,65 @@ module load StdEnv/2023 python/3.13.2
 
 /home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/deepTools/deeptools/vcf_env/bin/bamCoverage -b ${1} --normalizeUsing RPKM --outFileFormat bedgraph --binSize 100000 --ignoreDuplicates --minMappingQuality 30 -o ${1}_bamCoverage.bw
 ```
-# Plot
+# Fix depth outputfiles
+```R
+library (ggplot2)
+library(tidyverse)
+library(reshape2) # this facilitates the overlay plot
+setwd("./")
+# read in the data 
+rm(list=ls()) # removes all variables
+
+options(scipen=999)
+
+sample_vector <- c("fem_pygm_ELI1682","fem_pygm_ELI2081","fem_pygm_ELI2372","fem_pygm_ELI3012","mal_pygm_ELI1681","mal_pygm_ELI2347","mal_pygm_ELI2370","mal_pygm_ELI2545")
+
+
+my_df_wide <- data.frame(contig=character(),
+                    start=integer(),
+                    stop=integer())
+
+
+# loop through each sample and correct merged rows
+for (sample in sample_vector){
+  # sample <- "female_allo_17A7"
+  #sample <- "male_allo_18AF"
+  a <- read.table(paste(eval(sample),"_sorted.bam_RPKMnorm_bamCoverage_10kb.bw", sep=""))
+  #a$sample <- eval(sample)
+  colnames(a) <- c("contig","start","stop",paste(eval(sample),"_depth", sep=""))
+  # here need to find places where consecutive bins have the same number of reads overlapping, because they will be merged.
+  # for example: male_allo_18AF_sorted_rg.bam_RPKMnorm_bamCoverage_10kb.bw:tig00000003	20000	40000	0.0394696
+  # Create an empty tibble to store the new data
+  new_df <- tibble()
+  expected_diff <- 10000
+# Loop through each row of the original dataframe
+  for (i in 1:nrow(a)) {
+    # Add the current row to the new dataframe
+    # Check the difference between columns for the current row
+    current_diff <- a$stop[i] - a$start[i]
+    print(paste(eval(sample)," ",eval(i)," ",eval(current_diff),sep=""))
+      # If the difference is not 10000, add a new row below
+      if (current_diff != expected_diff) { # there is a row with merged bins
+        for (j in 1:ceiling(current_diff/expected_diff)) { #for the number of merged bins
+          extra_row <- a[i,] # make a row
+          extra_row$start <- a$start[i] + (expected_diff*j) - expected_diff # adjust the start
+          extra_row$stop <- a$start[i] + (expected_diff*j)  # adjust the stop
+          new_df <- bind_rows(new_df, extra_row) #add this to a new df
+        }  
+      }else{ # there is not a row with merged bins
+          extra_row <- a[i,]
+          new_df <- bind_rows(new_df, extra_row)
+      }
+  }
+ # write to a new file
+ write.table(new_df, file = paste(eval(sample),"_sorted.bam_RPKMnorm_bamCoverage_10kb_fixedrowz.bw", sep=""), sep = "\t", row.names = FALSE) 
+}
+  
+```
+
+
+
+# Plot using the fixed files
 ```
 library (ggplot2)
 library(tidyverse)
@@ -65,47 +123,47 @@ my_df_wide <- data.frame(contig=character(),
 #dim(my_df)
 
 # loop through each sample and correct merged rows
-for (sample in sample_vector){
+#for (sample in sample_vector){
   # sample <- "female_allo_17A7"
   #sample <- "male_allo_18AF"
-  a <- read.table(paste(eval(sample),"_sorted_rg.bam_RPKMnorm_bamCoverage_10kb.bw", sep=""))
+#  a <- read.table(paste(eval(sample),"_sorted_rg.bam_RPKMnorm_bamCoverage_10kb.bw", sep=""))
   #a$sample <- eval(sample)
-  colnames(a) <- c("contig","start","stop",paste(eval(sample),"_depth", sep=""))
+#  colnames(a) <- c("contig","start","stop",paste(eval(sample),"_depth", sep=""))
   # here need to find places where consecutive bins have the same number of reads overlapping, because they will be merged.
   # for example: male_allo_18AF_sorted_rg.bam_RPKMnorm_bamCoverage_10kb.bw:tig00000003	20000	40000	0.0394696
   # Create an empty tibble to store the new data
-  new_df <- tibble()
-  expected_diff <- 10000
+#  new_df <- tibble()
+#  expected_diff <- 10000
 # Loop through each row of the original dataframe
-  for (i in 1:nrow(a)) {
+#  for (i in 1:nrow(a)) {
     # Add the current row to the new dataframe
     # Check the difference between columns for the current row
-    current_diff <- a$stop[i] - a$start[i]
-    print(paste(eval(sample)," ",eval(i)," ",eval(current_diff),sep=""))
+#    current_diff <- a$stop[i] - a$start[i]
+#    print(paste(eval(sample)," ",eval(i)," ",eval(current_diff),sep=""))
       # If the difference is not 10000, add a new row below
-      if (current_diff != expected_diff) { # there is a row with merged bins
-        for (j in 1:ceiling(current_diff/expected_diff)) { #for the number of merged bins
-          extra_row <- a[i,] # make a row
-          extra_row$start <- a$start[i] + (expected_diff*j) - expected_diff # adjust the start
-          extra_row$stop <- a$start[i] + (expected_diff*j)  # adjust the stop
-          new_df <- bind_rows(new_df, extra_row) #add this to a new df
-        }  
-      }else{ # there is not a row with merged bins
-          extra_row <- a[i,]
-          new_df <- bind_rows(new_df, extra_row)
-      }
-  }
+#      if (current_diff != expected_diff) { # there is a row with merged bins
+#        for (j in 1:ceiling(current_diff/expected_diff)) { #for the number of merged bins
+#          extra_row <- a[i,] # make a row
+#          extra_row$start <- a$start[i] + (expected_diff*j) - expected_diff # adjust the start
+#          extra_row$stop <- a$start[i] + (expected_diff*j)  # adjust the stop
+#          new_df <- bind_rows(new_df, extra_row) #add this to a new df
+#        }  
+#      }else{ # there is not a row with merged bins
+#          extra_row <- a[i,]
+#          new_df <- bind_rows(new_df, extra_row)
+#      }
+#  }
  # write to a new file
- write.table(new_df, file = paste(eval(sample),"_sorted_rg.bam_RPKMnorm_bamCoverage_10kb_fixedrowz.bw", sep=""), sep = "\t", row.names = FALSE) 
+# write.table(new_df, file = paste(eval(sample),"_sorted_rg.bam_RPKMnorm_bamCoverage_10kb_fixedrowz.bw", sep=""), sep = "\t", row.names = FALSE) 
 ##  my_df_wide <- merge(my_df_wide, new_df, by=c("contig","start","stop"), all=T) # merge the corrected df
   #my_df_wide <- full_join(my_df_wide, new_df, by = c("contig","start","stop")) # merge the corrected df
 #  my_df_wide <- merge(my_df_wide, a, by=c("contig","start","stop"), all=T) # merge the corrected df
   # check tig00008642  
-}
+#}
   
   
   
-dim(my_df_wide)
+#dim(my_df_wide)
 
 # Now read in the fixed files
 # loop through each sample and make a wide format df
