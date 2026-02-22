@@ -45,13 +45,13 @@ Before blasting the RNAseq transcripts I added an underscore so the length is pa
 ```
 sed -i 's/ len=/_len=/g' allo_trinity_assembly_all_batches.Trinity.fasta
 ```
+Now do the blast
+```
+blastn -query allo_trinity_assembly_all_batches.Trinity.fasta -db Y_tigs.fa_blastable -outfmt 6 -out allo_denovotranscripts_to_Y_tigs
+```
 Then, the blast output is prefiltered to include only 100% matches like this:
 ```
 grep '      100.000 ' allo_denovotranscripts_to_Y_tigs > expressed_Y_trnascriptz.out
-```
-
-```
-blastn -query allo_trinity_assembly_all_batches.Trinity.fasta -db Y_tigs.fa_blastable -outfmt 6 -out allo_denovotranscripts_to_Y_tigs
 ```
 
 Parse the results using this perl script
