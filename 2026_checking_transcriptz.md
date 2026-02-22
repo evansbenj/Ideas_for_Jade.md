@@ -1,21 +1,21 @@
 # Checking transcriptz
 
 Based on gene content, I think these 11 are Y-linked: 
-*tig00006146
-*tig00005690
-*tig00005092
-*tig00005113
-*tig00005103
-*tig00005106
-*tig00006042
-*tig00006035
-*tig00011671
-*tig00009702
-*tig00009703
+* tig00006146
+* tig00005690
+* tig00005092
+* tig00005113
+* tig00005103
+* tig00005106
+* tig00006042
+* tig00006035
+* tig00011671
+* tig00009702
+* tig00009703
 
 And these are X-linked:
-*tig00010978
-*tig00009681
+* tig00010978
+* tig00009681
 
 To identify transcripts with a perfect match to these contigs, I made blastdbs from each one:
 
