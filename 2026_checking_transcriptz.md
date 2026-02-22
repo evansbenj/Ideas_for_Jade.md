@@ -1,6 +1,7 @@
 # Checking transcriptz
 
 Based on gene content, I think these 11 are Y-linked: 
+
 * tig00006146
 * tig00005690
 * tig00005092
@@ -14,6 +15,7 @@ Based on gene content, I think these 11 are Y-linked:
 * tig00009703
 
 And these are X-linked:
+
 * tig00010978
 * tig00009681
 
