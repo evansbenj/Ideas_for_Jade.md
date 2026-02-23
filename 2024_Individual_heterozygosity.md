@@ -1,4 +1,31 @@
-# Calculating pi in windows for each genome
+# WGS: Heterozygosity 
+
+Bamfiles mapped to Adamallo are here:
+```
+/home/ben/projects/rrg-ben/ben/2024_cliv_allo_WGS/bamz_mapped_to_Adamallo_with_bubbles
+```
+I ran this script using a list of male and female bam files (so the heteroz is calculated by sex across all individuals within each sex:
+```
+#!/bin/sh
+#SBATCH --job-name=angsd
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --time=64:00:00
+#SBATCH --mem=512gb
+#SBATCH --output=angsd.%J.out
+#SBATCH --error=angsd.%J.err
+#SBATCH --account=rrg-ben
+
+module load StdEnv/2023 angsd/0.940
+
+angsd -P 1 -setMinChunkSize 50 -minMapQ 30 -minQ 20 -nQueueSize 20 -bam ${1}.txt -doSaf 1 -anc /home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/allo.fasta.contigs.fasta.gz -GL 1 -out ${1}_out
+realSFS ${1}_out.saf.idx -P 1 -fold 1 > ${1}_out.sfs
+realSFS saf2theta ${1}_out.saf.idx -sfs ${1}_out.sfs -outname ${1}_out
+thetaStat do_stat ${1}_out.thetas.idx -win 10000 -step 10000  -outnames ${1}_theta.thetasWindow.gz
+```
+
+
+# RNAseq: Calculating pi in windows for each genome
 I'm using angsd for this.
 
 bam files are here:
