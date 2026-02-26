@@ -47,6 +47,12 @@ sed -i 's/ len=/_len=/g' allo_trinity_assembly_all_batches.Trinity.fasta
 ```
 Now do the blast
 ```
+blastn -query allo_trinity_assembly_all_batches.Trinity.fasta -db Y_tigs.fa_blastable -outfmt 6 -gapopen 1 -gapextend 2 -penalty -1 -reward 1 -perc_identity 100 -qcov_hsp_perc 100 -out allo_denovotranscripts_to_Y_tigs_
+```
+
+Bad way below:
+
+```
 blastn -query allo_trinity_assembly_all_batches.Trinity.fasta -db Y_tigs.fa_blastable -outfmt 6 -out allo_denovotranscripts_to_Y_tigs
 ```
 Then, the blast output is prefiltered to include only 100% matches like this:
