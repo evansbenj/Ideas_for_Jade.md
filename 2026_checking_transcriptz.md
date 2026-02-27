@@ -50,6 +50,21 @@ Now do the blast
 blastn -query allo_trinity_assembly_all_batches.Trinity.fasta -db Y_tigs.fa_blastable -outfmt 6 -gapopen 1 -gapextend 2 -penalty -1 -reward 1 -perc_identity 100 -qcov_hsp_perc 100 -out allo_denovotranscripts_to_Y_tigs_
 ```
 
+# Blat and gmap
+```
+/home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/with_bubbles
+```
+```
+module load StdEnv/2023 gmap-gsnap/2024-10-20
+gmap_build -d Y_tigs.fa_gmap -D /home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/with_bubbles/ Y_tigs.fa
+gsnap -D /home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/Adam_allo_genome_assembly/with_bubbles/Y_tigs.fa_gmap -d Y_tigs.fa_gmap -m 0 allo_trinity_assembly_all_batches.Trinity.fasta > output.gff3
+```
+
+```
+module load StdEnv/2023  gcc/12.3 blat/3.7
+blat -minIdentity=100 -minScore=20 -tileSize=11 -oneOff=0 -maxGap=0 Y_tigs.fa allo_trinity_assembly_all_batches.Trinity.fasta blat_output.psl
+```
+
 Bad way below:
 
 ```
