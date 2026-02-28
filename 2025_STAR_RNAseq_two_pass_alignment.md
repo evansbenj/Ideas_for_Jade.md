@@ -1,5 +1,9 @@
 # Mapping RNAseq data to allofraseri genome assembly
 
+bam files are here:
+```
+/home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/allo_RNAseq_mappedto_AdamalloPacBiogenome_bamz/with_bubbles
+```
 Directory:
 ```
 /home/ben/projects/rrg-ben/ben/2025_allo_PacBio_assembly/ben_scripts
