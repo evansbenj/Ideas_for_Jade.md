@@ -83,3 +83,22 @@ foreach $key (sort(keys %hash)) {
 }
 close OUTFILE;
 ```
+
+# Depth in coding region
+
+Only save positions where females are zero and males are greater than 10.
+
+```
+#!/bin/sh
+#SBATCH --job-name=samtools_depth
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --time=24:00:00
+#SBATCH --mem=8gb
+#SBATCH --output=samtools_depth.%J.out
+#SBATCH --error=samtools_depth.%J.err
+#SBATCH --account=rrg-ben
+
+module load StdEnv/2023  gcc/12.3 samtools/1.20
+samtools depth -aa -f ${1}.txt -b ${2} | awk '$3==0 && $4==0 && $5==0 && $6==0 && $7>10 && $8>10 && $9>10 && $10>10' >> ${1}_CDS_femalez_are_zerodepth_aa.txt
+```
