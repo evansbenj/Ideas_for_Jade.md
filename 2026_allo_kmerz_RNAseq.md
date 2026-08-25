@@ -154,3 +154,7 @@ Expression detected in two tadz only (both male):
 -rw-r----- 1 ben rrg-ben    0 May 17 16:31 X_allofraseri_tad23_S9_dh*_29mers_with_counts.txt
 -rw-r----- 1 ben rrg-ben    0 May 17 16:31 X_allofraseri_tad24_S10_dh*_29mers_with_counts.txt
 ```
+#a@@18
+Expression also detected in the two male tadz:
+```
+```
