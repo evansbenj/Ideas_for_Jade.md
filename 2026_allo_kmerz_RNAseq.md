@@ -138,3 +138,19 @@ Not needed for XB but useful for allo:
   -mers allo_XXXW_target_kmers.meryl \
   -output ${1}_XXX_R1.fq.gz ${1}_XXX_R2.fq.gz
 ```
+# dh@@
+
+Expression detected in two tadz only (both male):
+```
+[ben@l4.nibi allo_fq]$ ls -l *dh*W_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 May 17 16:31 X_allofraseri_tad13_S1_dh*_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 May 17 16:31 X_allofraseri_tad14_S2_dh*_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben 9086 May 17 16:31 X_allofraseri_tad15_S3_dh*_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 May 17 16:31 X_allofraseri_tad16_S4_dh*_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 May 17 16:31 X_allofraseri_tad17_S5_dh*_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 May 17 16:31 X_allofraseri_tad19_S6_dh*_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 May 17 16:31 X_allofraseri_tad20_S7_dh*_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben 9164 May 17 16:31 X_allofraseri_tad21_S8_dh*_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 May 17 16:31 X_allofraseri_tad23_S9_dh*_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 May 17 16:31 X_allofraseri_tad24_S10_dh*_29mers_with_counts.txt
+```
