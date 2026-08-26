@@ -157,4 +157,15 @@ Expression detected in two tadz only (both male):
 #a@@18
 Expression also detected in the two male tadz:
 ```
+[ben@l4.nibi allo_fq]$ ls -l *_aldh18aW_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 Aug 25 20:49 X_allofraseri_tad13_S1_aldh18aW_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 Aug 25 20:49 X_allofraseri_tad14_S2_aldh18aW_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben 1120 Aug 25 20:49 X_allofraseri_tad15_S3_aldh18aW_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 Aug 25 20:49 X_allofraseri_tad16_S4_aldh18aW_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 Aug 25 20:49 X_allofraseri_tad17_S5_aldh18aW_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 Aug 25 20:49 X_allofraseri_tad19_S6_aldh18aW_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 Aug 25 20:49 X_allofraseri_tad20_S7_aldh18aW_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben 1952 Aug 25 20:49 X_allofraseri_tad21_S8_aldh18aW_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 Aug 25 20:49 X_allofraseri_tad23_S9_aldh18aW_29mers_with_counts.txt
+-rw-r----- 1 ben rrg-ben    0 Aug 25 20:49 X_allofraseri_tad24_S10_aldh18aW_29mers_with_counts.txt
 ```
